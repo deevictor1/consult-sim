@@ -3,6 +3,8 @@
 A small voice-enabled role-play simulator. You play a clinician, an AI plays a patient, and a short
 rubric-based review follows. Built to show a Django + React/TypeScript stack with a streaming voice loop.
 
+![Consultation Practice](images/screenshot.png)
+
 **Scenario:** a smoking cessation conversation with a fictional patient (Mr Reeves). It is a communication
 exercise only and gives no clinical advice.
 
