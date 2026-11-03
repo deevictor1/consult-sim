@@ -10,7 +10,7 @@ exercise only and gives no clinical advice.
 
 ## How it works
 
-
+```mermaid
 flowchart TD
     User([Clinician / User])
 
@@ -53,6 +53,7 @@ flowchart TD
     UI -->|"Assessment request"| Feedback
     Feedback --> Scoring
     Scoring -->|"Structured feedback"| UI
+```
 
 ```
 Browser (React + TS)                         Django
