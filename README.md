@@ -10,6 +10,50 @@ exercise only and gives no clinical advice.
 
 ## How it works
 
+
+flowchart TD
+    User([Clinician / User])
+
+    subgraph Browser["Browser: React + TypeScript"]
+        UI["Consultation Interface"]
+        STT["Speech Recognition"]
+        Buffer["Sentence Buffer"]
+        TTS["Speech Synthesis"]
+    end
+
+    subgraph Backend["Backend: Django"]
+        Chat["POST /api/chat/stream"]
+        Provider["Provider Interface<br/>provider.stream()"]
+        Feedback["POST /api/feedback"]
+        Scoring["Rubric Scoring<br/>Validated JSON"]
+    end
+
+    subgraph LLM["LLM Providers"]
+        Anthropic["Anthropic"]
+        OpenAI["OpenAI"]
+        Mock["Mock Provider"]
+    end
+
+    User -->|"Speaks"| STT
+    STT -->|"Recognised text"| UI
+    UI -->|"Conversation request"| Chat
+    Chat --> Provider
+
+    Provider <--> Anthropic
+    Provider <--> OpenAI
+    Provider <--> Mock
+
+    Provider -->|"Streamed tokens"| Chat
+    Chat -->|"Server-Sent Events (SSE)"| UI
+    UI --> Buffer
+    Buffer -->|"Completed sentences"| TTS
+    TTS -->|"Spoken response"| User
+
+    User -->|"Finishes consultation"| UI
+    UI -->|"Assessment request"| Feedback
+    Feedback --> Scoring
+    Scoring -->|"Structured feedback"| UI
+
 ```
 Browser (React + TS)                         Django
  mic -> SpeechRecognition  --POST /api/chat/stream-->  provider.stream()  -> Anthropic | OpenAI | mock
