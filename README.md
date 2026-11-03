@@ -55,21 +55,23 @@ flowchart TD
     Scoring -->|"Structured feedback"| UI
 ```
 
-```
-Browser (React + TS)                         Django
- mic -> SpeechRecognition  --POST /api/chat/stream-->  provider.stream()  -> Anthropic | OpenAI | mock
- tokens (SSE) <-----------------------------------------'
- tokens -> sentence buffer -> speechSynthesis   (speech starts before the reply has finished)
- "Finish" --POST /api/feedback--> rubric scoring (JSON, validated server-side)
-```
+- **Streaming responses:** Django sends model output to the browser as Server-Sent Events (SSE).
+  The client buffers incoming text and begins speaking each completed sentence before the
+  full response has arrived.
 
-- **Streaming:** the server forwards model tokens as server-sent events. The client speaks each sentence as soon
-  as it completes, instead of waiting for the full reply.
-- **Barge-in:** pressing Speak or sending a new message aborts the in-flight request and cancels queued speech.
-- **Provider-agnostic:** `roleplay/llm.py` defines a small `Provider` interface with Anthropic, OpenAI and a
-  keyless mock. Add another by implementing `stream()`.
-- **No persistence:** there is no database. Transcripts are not stored, and failures are logged without message content.
-- **Validated input:** message count, length, roles and ordering are checked before anything reaches a model.
+- **Interruptible speech:** Starting a new response or ending the voice session aborts the
+  active request and cancels queued speech.
+
+- **Provider abstraction:** `roleplay/llm.py` defines a common `Provider` interface.
+  Anthropic, OpenAI and a keyless mock provider implement `stream()`.
+
+- **No transcript persistence:** The backend does not store consultation transcripts in a
+  database. Conversation content is held in the browser during the session and sent to the
+  selected LLM provider for response generation and feedback.
+
+- **Server-side input checks:** The API validates message count, allowed roles, non-empty
+  content, message length and required conversation boundaries before processing messages.
+
 
 ## Run it
 
